@@ -9,7 +9,7 @@ from torch.autograd import Variable
 BatchSize = 64
 # SIZE = 28
 CUDA = True
-EPOCHS = 10
+EPOCHS = 20
 
 def normalization(input):
     return torch.div(torch.add(input,-torch.mean(input)),torch.std(input))
@@ -143,7 +143,7 @@ def get_w(k,c,output_size,train_loader,sparsityParam=0.05,epochs=10,layer=True,k
               +(1-sparsityParam)*torch.log((1-sparsityParam)/(1-KLD_element))
         return BCE + KLD
 
-    optimizer = optim.SGD(model.parameters(),lr=1e-3)
+    optimizer = optim.Adam(model.parameters())
 
     if not layer:
         CNN_model = CNN1(k1)
@@ -205,12 +205,12 @@ test_loader = torch.utils.data.DataLoader(
     batch_size=BatchSize, shuffle=True, num_workers=1, pin_memory=True)
 
 
-kernal1 = get_w(11,1,1000,train_loader,sparsityParam=0.05,epochs=1,layer=True)
+kernal1 = get_w(11,1,1000,train_loader,sparsityParam=0.05,epochs=10,layer=True)
 
 kernal1 = kernal1.resize(1000,1,11,11)
 kernal1 = kernal1.data
 print "get kernal1"
-kernal2 = get_w(2,1000,1500,train_loader,sparsityParam=0.05,epochs=1,layer=False,k1=kernal1)
+kernal2 = get_w(2,1000,1500,train_loader,sparsityParam=0.05,epochs=10,layer=False,k1=kernal1)
 print "get kernal2"
 kernal2 = kernal2.resize(1500,1000,2,2)
 kernal2 = kernal2.data
@@ -226,7 +226,7 @@ D_parameters = [
     {'params': CNN_model1.fc3.parameters()}
 ] # define a part of parameters in model
 
-optimizer = optim.SGD(D_parameters, lr=0.01, momentum=0.5)
+optimizer = optim.Adam(D_parameters)
 
 def train(epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
