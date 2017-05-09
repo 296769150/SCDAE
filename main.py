@@ -9,7 +9,7 @@ from torch.autograd import Variable
 BatchSize = 64
 # SIZE = 28
 CUDA = True
-EPOCHS = 10
+EPOCHS = 20
 
 def normalization(input):
     return torch.div(torch.add(input,-torch.mean(input)),torch.std(input))
